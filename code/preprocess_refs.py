@@ -1,3 +1,19 @@
+"""
+Διαβάζει τα αρχεία αναφοράς από refs/ και παράγει καθαρά CSV στο csv/,
+έτοιμα για LOAD DATA INFILE.
+
+Output αρχεία:
+    csv/diagnosi.csv            ΔΙΑΓΝΩΣΗ (όλα τα ICD-10 codes ΕΚΤΟΣ από R)
+    csv/sumptoma.csv            ΣΥΜΠΤΩΜΑ (μόνο R-codes)
+    csv/ken.csv                 ΚΕΝ (parsed από ken.html)
+    csv/farmako.csv             ΦΑΡΜΑΚΟ
+    csv/drastiki_ousia.csv      ΔΡΑΣΤΙΚΗ_ΟΥΣΙΑ (unique active substances)
+    csv/drastikes_farmakou.csv  ΔΡΑΣΤΙΚΕΣ_ΟΥΣΙΕΣ_ΦΑΡΜΑΚΟΥ (M:N)
+    csv/epemvasi_catalog.csv    ΕΠΕΜΒΑΣΗ κατάλογος (κατηγορίες Γ/Δ/Ε)
+    csv/ergastiriaki_catalog.csv ΕΡΓΑΣΤΗΡΙΑΚΗ ΕΞΕΤΑΣΗ κατάλογος (Α/Β)
+    csv/icd_ken_map.csv         mapping ICD-10 → ΚΕΝ (για ΝΟΣΗΛΕΙΑ)
+"""
+
 from __future__ import annotations
 
 import csv
@@ -262,20 +278,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
-
-
-"""
-Διαβάζει τα αρχεία αναφοράς από refs/ και παράγει καθαρά CSV στο csv/,
-έτοιμα για LOAD DATA INFILE.
-
-Output αρχεία:
-    csv/diagnosi.csv            ΔΙΑΓΝΩΣΗ (όλα τα ICD-10 codes ΕΚΤΟΣ από R)
-    csv/sumptoma.csv            ΣΥΜΠΤΩΜΑ (μόνο R-codes)
-    csv/ken.csv                 ΚΕΝ (parsed από ken.html)
-    csv/farmako.csv             ΦΑΡΜΑΚΟ
-    csv/drastiki_ousia.csv      ΔΡΑΣΤΙΚΗ_ΟΥΣΙΑ (unique active substances)
-    csv/drastikes_farmakou.csv  ΔΡΑΣΤΙΚΕΣ_ΟΥΣΙΕΣ_ΦΑΡΜΑΚΟΥ (M:N)
-    csv/epemvasi_catalog.csv    ΕΠΕΜΒΑΣΗ κατάλογος (κατηγορίες Γ/Δ/Ε)
-    csv/ergastiriaki_catalog.csv ΕΡΓΑΣΤΗΡΙΑΚΗ ΕΞΕΤΑΣΗ κατάλογος (Α/Β)
-    csv/icd_ken_map.csv         mapping ICD-10 → ΚΕΝ (για ΝΟΣΗΛΕΙΑ)
-"""

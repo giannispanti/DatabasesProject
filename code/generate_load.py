@@ -1,14 +1,4 @@
-#!/usr/bin/env python3
-"""generate_load.py
-
-Παράγει το αρχείο load_data.sql:
-    1. LOAD DATA LOCAL INFILE statements για τα reference data (από csv/)
-    2. INSERT statements για τα Faker-generated data σε σωστή FK order,
-       σεβόμενος όλα τα CHECK constraints και triggers του install_new.sql.
-
-Εκτελεί:  python3 generate_load.py
-Output:   /home/odysseastzaris/Documents/databases/load_data.sql
-"""
+# Παράγει το αρχείο load_data.sql
 
 from __future__ import annotations
 
@@ -25,7 +15,6 @@ from typing import Iterable
 import pandas as pd
 from faker import Faker
 
-# ─────────────────────────────────────────────────────────────────────────────
 # Paths / setup
 ROOT = Path(__file__).resolve().parent
 PROJECT_ROOT = ROOT.parent
@@ -36,11 +25,10 @@ fake = Faker("el_GR")
 Faker.seed(42)
 random.seed(42)
 
-# ─────────────────────────────────────────────────────────────────────────────
 # Configuration
 
 # Volumes
-N_TMHMA = 15          # 15 τμήματα + 5 επιπλέον για κάλυψη πολλαπλών τμημάτων ανά ιατρό
+N_TMHMA = 15             # 15 τμήματα + 5 επιπλέον για κάλυψη πολλαπλών τμημάτων ανά ιατρό
 N_DOCTORS = 300          # συμπεριλαμβάνει 15 διευθυντές
 N_NURSES = 400
 N_ADMIN = 100
@@ -122,7 +110,6 @@ SHIFT_HOURS = {
     "ΝΥΧΤΕΡΙΝΗ":   ("23:00:00", "07:00:00", 1),
 }
 
-# ─────────────────────────────────────────────────────────────────────────────
 # SQL escape helpers
 
 def sql_str(v) -> str:
@@ -194,8 +181,6 @@ def random_date(start: date, end: date) -> date:
     delta = (end - start).days
     return start + timedelta(days=random.randint(0, delta))
 
-
-# ─────────────────────────────────────────────────────────────────────────────
 # Build everything
 
 def build() -> None:
@@ -241,8 +226,7 @@ def build() -> None:
     epemvasi_cat = pd.read_csv(CSV_DIR / "epemvasi_catalog.csv")
     ergastiriaki_cat = pd.read_csv(CSV_DIR / "ergastiriaki_catalog.csv")
 
-    # Φτιάξε lookup: farmako_code → set of substance codes  
-    # (διάβασε από το drastikes_farmakou.csv)
+    # Φτιάχνουμε lookup: farmako_code → set of substance codes  
     drug_substances = pd.read_csv(CSV_DIR / "drastikes_farmakou.csv")
     drug_sub_map: dict[str, set[str]] = defaultdict(set)
     for _, r in drug_substances.iterrows():
@@ -253,7 +237,7 @@ def build() -> None:
                      [(p,) for p, _desc in INSURANCE_PROVIDERS]))
     insurance_types = [p for p, _ in INSURANCE_PROVIDERS]
 
-    # 2.2 ΠΡΟΣΩΠΙΚΟ (όλοι 290) — αλλά πρώτα παράγουμε όλα τα attrs
+    # 2.2 ΠΡΟΣΩΠΙΚΟ (όλοι 800) — αλλά πρώτα παράγουμε όλα τα attrs
     amka_gen = unique_amka_factory()
     email_gen = unique_email_factory()
 
@@ -652,9 +636,9 @@ def build() -> None:
     SET k.ΚΑΤΑΣΤΑΣΗ = 'ΚΑΤΕΙΛΗΜΜΕΝΗ'
     WHERE n.ΗΜΕΡΟΜΗΝΙΑ_ΕΞΟΔΟΥ IS NULL;\n\n""")
 
-    # 2.17 ΕΦΗΜΕΡΙΑ, ΒΑΡΔΙΑ, ΕΦΗΜΕΡΙΑ_ΠΡΟΣΩΠΙΚΟΥ (το πιο δύσκολο)
+    # 2.17 ΕΦΗΜΕΡΙΑ, ΒΑΡΔΙΑ, ΕΦΗΜΕΡΙΑ_ΠΡΟΣΩΠΙΚΟΥ
     out.append("-- ΕΦΗΜΕΡΙΑ\n")
-    # 5 τυχαίες μέρες 2023 | 10 τυχαίες 2024 | 15 τυχαίες 2025
+    # 5 τυχαίες μέρες 2023 | 10 τυχαίες 2024 εκ των οποίων 1 εβδομάδα συνεχόμενη για τα queries | 15 τυχαίες 2025
     _start = date(2025, 4, 7)  # ή όποια εβδομάδα θες
     consecutive_week = [_start + timedelta(days=i) for i in range(7)]
 
@@ -680,7 +664,7 @@ def build() -> None:
                      ["ΤΥΠΟΣ_ΒΑΡΔΙΑΣ", "ΗΜΕΡΟΜΗΝΙΑ_FK", "ΤΜΗΜΑ_FK",
                       "ΟΜΑΔΑ_ΕΦΗΜΕΡΙΑΣ"], vardia_rows))
 
-    # ── ΕΦΗΜΕΡΙΑ_ΠΡΟΣΩΠΙΚΟΥ (Final Logic with Senior Fallbacks)
+    # ── ΕΦΗΜΕΡΙΑ_ΠΡΟΣΩΠΙΚΟΥ
     out.append("-- ΕΦΗΜΕΡΙΑ_ΠΡΟΣΩΠΙΚΟΥ (honors all triggers & tiered senior selection)\n")
 
     # Helper: shift end datetime
@@ -704,13 +688,13 @@ def build() -> None:
             if monthly_count[key] >= limit:
                 return False
 
-        # 2. 8h rest gap (STRICT)
+        # 2. 8h ξεκούραση μεταξύ βαρδιών
         new_s, new_e = shift_window(d, stype)
         for prev_s, prev_e in person_shift_times[amka]:
             if new_s < prev_e + timedelta(hours=8) and new_e + timedelta(hours=8) > prev_s:
                 return False
 
-        # 3. 3 consecutive nights (STRICT)
+        # 3. Μέγιστο 2 συνεχόμενες νυχτερινές
         if stype == "ΝΥΧΤΕΡΙΝΗ":
             back = 0
             check = d - timedelta(days=1)
