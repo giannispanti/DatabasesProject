@@ -1,0 +1,8 @@
+|------
+|Δραστική Ουσία 1|Δραστική Ουσία 2|Συχνότητα Εμφάνισης (Ζεύγους)
+|------
+|Apixaban|Ibuprofen|3
+|Codeine Phosphate|Water For Injection|3
+|Histamine Dihydrochloride|Water For Injection|3
+|Codeine Phosphate|Histamine Dihydrochloride|3
+|Atorvastatin, Ezetimibe|Ibuprofen|3
