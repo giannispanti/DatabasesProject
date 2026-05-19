@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ doctor.ΟΝΟΜΑ }} {{ doctor.ΕΠΩΝΥΜΟ }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <a href="/doctors" class="btn btn-outline-secondary mb-4">&larr; Πίσω</a>
+    
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Καρτέλα Ιατρού: {{ doctor.ΟΝΟΜΑ }} {{ doctor.ΕΠΩΝΥΜΟ }}</h2>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 text-center bg-light p-4 rounded mb-3">
+                    <span class="display-1 fw-bold text-secondary">Δρ.</span>
+                    <h3 class="mt-3">{{ doctor.ΟΝΟΜΑ }} {{ doctor.ΕΠΩΝΥΜΟ }}</h3>
+                    <span class="badge bg-success fs-6">{{ doctor.ΒΑΘΜΙΔΑ }}</span>
+                </div>
+                <div class="col-md-8">
+                    <h4>Πλήρη Στοιχεία από τη Βάση Δεδομένων</h4>
+                    <table class="table table-bordered mt-3">
+                        <tr>
+                            <th class="bg-light" style="width: 35%;">ΑΜΚΑ</th>
+                            <td>{{ doctor.ΑΜΚΑ }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Ειδικότητα</th>
+                            <td>{{ doctor.ΕΙΔΙΚΟΤΗΤΑ }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Αριθμός Άδειας Συλλόγου</th>
+                            <td>{{ doctor.ΑΡΙΘΜΟΣ_ΑΔΕΙΑΣ_ΣΥΛΛΟΓΟΥ }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Email επικοινωνίας</th>
+                            <td>{{ doctor.EMAIL }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Ημερομηνία Γέννησης</th>
+                            <td>{{ doctor.ΗΜΕΡΟΜΗΝΙΑ_ΓΕΝΝΗΣΗΣ }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Ημερομηνία Πρόσληψης</th>
+                            <td>{{ doctor.ΗΜΕΡΟΜΗΝΙΑ_ΠΡΟΣΛΗΨΗΣ }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

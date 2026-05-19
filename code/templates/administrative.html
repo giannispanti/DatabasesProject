@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Διοικητικό Προσωπικό - Υγειόπολης{% endblock %}
+
+{% block content %}
+
+<h1 class="mb-4">Διοικητικό Προσωπικό</h1>
+
+<div class="row">
+    {% for admin in administrative %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm text-center">
+            
+            <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 150px;">
+                <span class="display-6 fw-bold">Administrative</span>
+            </div>
+            
+            <div class="card-body">
+                <h5 class="card-title text-primary">{{ admin.ΟΝΟΜΑ }} {{ admin.ΕΠΩΝΥΜΟ }}</h5>
+                
+                <p class="card-text text-start">
+                    <strong>Ρόλος:</strong> {{ admin.ΡΟΛΟΣ }}<br>
+                    <strong>Γραφείο Εργασίας:</strong> {{ admin.ΓΡΑΦΕΙΟ_ΕΡΓΑΣΙΑΣ }}<br>
+                    <small class="text-muted">Email: {{ admin.EMAIL }}</small>
+                </p>
+                
+                <a href="{{ url_for('administrative_detail', amka=admin.ΑΜΚΑ) }}" class="btn btn-sm btn-primary">Προβολή Λεπτομερειών</a>
+            </div>
+        </div>
+    </div>
+    
+    {% else %}
+    <div class="col-12">
+        <div class="alert alert-info">Δεν βρέθηκαν καταχωρημένοι διοικητικοί υπάλληλοι στο σύστημα.</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
