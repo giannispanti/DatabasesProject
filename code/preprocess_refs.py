@@ -1,21 +1,3 @@
-#!/usr/bin/env python3
-"""preprocess_refs.py
-
-Διαβάζει τα αρχεία αναφοράς από refs/ και παράγει καθαρά CSV στο csv/,
-έτοιμα για LOAD DATA INFILE.
-
-Output αρχεία:
-    csv/diagnosi.csv            ΔΙΑΓΝΩΣΗ (όλα τα ICD-10 codes ΕΚΤΟΣ από R)
-    csv/sumptoma.csv            ΣΥΜΠΤΩΜΑ (μόνο R-codes)
-    csv/ken.csv                 ΚΕΝ (parsed από ken.html)
-    csv/farmako.csv             ΦΑΡΜΑΚΟ
-    csv/drastiki_ousia.csv      ΔΡΑΣΤΙΚΗ_ΟΥΣΙΑ (unique active substances)
-    csv/drastikes_farmakou.csv  ΔΡΑΣΤΙΚΕΣ_ΟΥΣΙΕΣ_ΦΑΡΜΑΚΟΥ (M:N)
-    csv/epemvasi_catalog.csv    ΕΠΕΜΒΑΣΗ κατάλογος (κατηγορίες Γ/Δ/Ε)
-    csv/ergastiriaki_catalog.csv ΕΡΓΑΣΤΗΡΙΑΚΗ ΕΞΕΤΑΣΗ κατάλογος (Α/Β)
-    csv/icd_ken_map.csv         mapping ICD-10 → ΚΕΝ (για ΝΟΣΗΛΕΙΑ)
-"""
-
 from __future__ import annotations
 
 import csv
@@ -33,10 +15,11 @@ OUT.mkdir(exist_ok=True)
 
 ICD10_RE = re.compile(r"^[A-Z][0-9]{2}(\.[0-9A-Z]{1,4})?[\+\*]?$")
 
-# ---------------------------------------------------------------- ICD-10
+# ICD-10
 
 def preprocess_icd10() -> None:
-    """Διαχωρίζει ICD-10 σε ΔΙΑΓΝΩΣΗ (όχι R-codes) και ΣΥΜΠΤΩΜΑ (R-codes)."""
+    # Διαχωρίζουμε ICD-10 σε ΔΙΑΓΝΩΣΗ (όχι R-codes) και ΣΥΜΠΤΩΜΑ (R-codes).
+    
     df = pd.read_excel(REFS / "icd10.xls", sheet_name=0, header=None,
                        names=["code", "description"])
     df["code"] = df["code"].astype(str).str.strip().str.upper()
@@ -62,16 +45,13 @@ def preprocess_icd10() -> None:
     print(f"  sumptoma.csv: {len(sumptoma)} rows")
 
 
-# ---------------------------------------------------------------- ΚΕΝ
+# ΚΕΝ
 
 def preprocess_ken() -> None:
-    """Parse ken.html → ken.csv. Κρατάει κωδικό, τίτλο, περιγραφή, ΜΔΝ.
+    
 
-    Η δομή κάθε γραμμής στο DOC είναι:
-        [κωδικός ΚΕΝ | περιγραφή ΚΕΝ | ΜΔΝ | κόστος | ...]
-
-    Σημείωση: τα ΚΕΝ codes έχουν μορφή π.χ. "Α01Α", "Β02Χ", "Α01Μ" κλπ (Ελληνικά).
-    """
+    # Η δομή κάθε γραμμής στο DOC είναι: [κωδικός ΚΕΝ | περιγραφή ΚΕΝ | ΜΔΝ | κόστος | ...]
+    
     html = (REFS / "ken.html").read_text(encoding="utf-8", errors="replace")
     soup = BeautifulSoup(html, "lxml")
     rows: list[tuple[str, str, int]] = []
@@ -98,7 +78,7 @@ def preprocess_ken() -> None:
             if title:
                 rows.append((code, title[:200], mdn))
 
-    # dedup
+    # setup
     seen = set()
     unique = []
     for code, title, mdn in rows:
@@ -115,10 +95,10 @@ def preprocess_ken() -> None:
     print(f"  ken.csv: {len(unique)} rows")
 
 
-# ---------------------------------------------------------------- EMA Φάρμακα
+# EMA Φάρμακα
 
 def preprocess_ema() -> None:
-        # Διάβασμα: header στη γραμμή 20 (0-based 19), data από γραμμή 21
+    # Διάβασμα: header στη γραμμή 20 (0-based 19), data από γραμμή 21
     df = pd.read_excel(REFS / "ema_article57.xlsx", sheet_name=0,
                        skiprows=19, header=0)
     df.columns = ["product_name", "active_substance", "route",
@@ -144,25 +124,23 @@ def preprocess_ema() -> None:
                 str(r["route"])[:150] 
             ])
 
-    # --- Βελτιωμένο Split & Clean ---
     drugs["substances"] = drugs["active_substance"].astype(str).str.split("|")
     exploded = drugs[["ema_code", "substances"]].explode("substances")
 
-    # Καθαρισμός από κενά ΚΑΙ αφαίρεση άδειων εγγραφών
+    # Καθαρισμός από κενά και αφαίρεση άδειων εγγραφών
     exploded["substances"] = exploded["substances"].str.strip()
     exploded = exploded[exploded["substances"].str.len() > 0]
     exploded = exploded[~exploded["substances"].isin(["nan", "None", "NULL"])] # Διώχνει τα σκουπίδια της Pandas
 
-    # Unique substances - ΔΗΜΙΟΥΡΓΙΑ ΜΟΝΟ ΓΙΑ ΠΡΑΓΜΑΤΙΚΑ ΟΝΟΜΑΤΑ
+    # Unique substances 
     unique_subs = sorted(exploded["substances"].unique())
     sub_to_code = {s: "DO-" + str(i + 1).zfill(5) for i, s in enumerate(unique_subs)}
 
-    # --- ΕΞΟΔΟΣ ΔΡΑΣΤΙΚΗ_ΟΥΣΙΑ (Με χρήση κατηγορίας από το Route) ---
+    # ΕΞΟΔΟΣ ΔΡΑΣΤΙΚΗ_ΟΥΣΙΑ (Με χρήση κατηγορίας από το Route) ---
     with (OUT / "drastiki_ousia.csv").open("w", encoding="utf-8", newline="") as f:
         w = csv.writer(f, quoting=csv.QUOTE_MINIMAL, lineterminator='\n')
         w.writerow(["code", "name", "category"])
         for s in unique_subs:
-            # Εδώ αντί για "EMA Article 57", βάζουμε κάτι πιο χρήσιμο
             w.writerow([sub_to_code[s], s[:200], "Φαρμακευτική Ουσία"])
 
     # M:N ΔΡΑΣΤΙΚΕΣ_ΟΥΣΙΕΣ_ΦΑΡΜΑΚΟΥ
@@ -185,7 +163,7 @@ def preprocess_ema() -> None:
     print(f"  drastikes_farmakou.csv: {len(seen_pairs)} rows")
 
 
-# ---------------------------------------------------------------- Ιατρικές πράξεις
+# Ιατρικές πράξεις
 
 def preprocess_praxeis() -> None:
     """Διαχωρίζει σε:
@@ -211,7 +189,7 @@ def preprocess_praxeis() -> None:
         if not code or not name_s or not current_cat:
             continue
         if name_s.upper() == "ΑΝΕΝΕΡΓΟΣ":
-            continue  # placeholder rows
+            continue
         rows.append((current_cat, code, name_s[:200]))
 
     with (OUT / "epemvasi_catalog.csv").open("w", encoding="utf-8", newline="") as f:
@@ -222,7 +200,7 @@ def preprocess_praxeis() -> None:
 
         for cat, code, name in rows:
             if cat in ("Γ", "Δ", "Ε"):
-                w.writerow([code, CAT_MAP[cat], name[:25]]) # ΕΠΕΜΒΑΣΗ.ΟΝΟΜΑ VARCHAR(25)
+                w.writerow([code, CAT_MAP[cat], name[:25]]) 
                 n += 1
         print(f"  epemvasi_catalog.csv: {n} rows")
 
@@ -237,10 +215,9 @@ def preprocess_praxeis() -> None:
         print(f"  ergastiriaki_catalog.csv: {n} rows")
 
 
-# ---------------------------------------------------------------- ICD ↔ ΚΕΝ map
+# ICD ↔ ΚΕΝ map
 
 def preprocess_icd_ken_map() -> None:
-    """Optional mapping — δεν φορτώνεται σε table αλλά χρησιμεύει στο generator."""
     try:
         df = pd.read_csv(REFS / "icd_ken_map.csv", header=0)
     except Exception as e:
@@ -265,7 +242,7 @@ def preprocess_icd_ken_map() -> None:
     print(f"  icd_ken_map.csv: {len(rows)} rows")
 
 
-# ---------------------------------------------------------------- main
+# main
 
 def main() -> int:
     print("==> Preprocessing reference files")
@@ -285,3 +262,20 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
+
+"""
+Διαβάζει τα αρχεία αναφοράς από refs/ και παράγει καθαρά CSV στο csv/,
+έτοιμα για LOAD DATA INFILE.
+
+Output αρχεία:
+    csv/diagnosi.csv            ΔΙΑΓΝΩΣΗ (όλα τα ICD-10 codes ΕΚΤΟΣ από R)
+    csv/sumptoma.csv            ΣΥΜΠΤΩΜΑ (μόνο R-codes)
+    csv/ken.csv                 ΚΕΝ (parsed από ken.html)
+    csv/farmako.csv             ΦΑΡΜΑΚΟ
+    csv/drastiki_ousia.csv      ΔΡΑΣΤΙΚΗ_ΟΥΣΙΑ (unique active substances)
+    csv/drastikes_farmakou.csv  ΔΡΑΣΤΙΚΕΣ_ΟΥΣΙΕΣ_ΦΑΡΜΑΚΟΥ (M:N)
+    csv/epemvasi_catalog.csv    ΕΠΕΜΒΑΣΗ κατάλογος (κατηγορίες Γ/Δ/Ε)
+    csv/ergastiriaki_catalog.csv ΕΡΓΑΣΤΗΡΙΑΚΗ ΕΞΕΤΑΣΗ κατάλογος (Α/Β)
+    csv/icd_ken_map.csv         mapping ICD-10 → ΚΕΝ (για ΝΟΣΗΛΕΙΑ)
+"""
