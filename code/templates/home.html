@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Νοσοκομείο Υγειόπολης{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="jumbotron text-center bg-cover home-hero p-5 rounded">
+    <div class="overlay"></div>
+    <div class="container position-relative text-white">
+        <h1 class="display-4">Καλώς ήλθατε στο Νοσοκομείο Υγειόπολης</h1>
+        <p class="lead">Ανακαλύψτε τις ανώτερες υπηρεσίες υγείας, τους αγαπημένους γιατρούς και προγραμματίστε την επόμενη σας διαδρομή υγειονομικής φροντίδας!</p>
+        <hr class="my-4">
+        <p>Περιηγηθείτε στη βάση δεδομένων μας και βρείτε τις καλύτερες υπηρεσίες υγείας!</p>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card h-100 feature-card">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar-event feature-icon"></i>
+                <h3 class="card-title mt-3">Ιατροί</h3>
+                <p class="card-text">Ανακαλύψτε τους Ιατρούς του Νοσοκομείου μας</p>
+                <a href="/doctors" class="btn btn-primary">Ανακαλύψτε τους Ιατρούς</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 feature-card">
+            <div class="card-body text-center">
+                <i class="bi bi-person feature-icon"></i>
+                <h3 class="card-title mt-3">Νοσηλευτές</h3>
+                <p class="card-text">Ανακαλύψτε τους Νοσηλευτές του Νοσοκομείου μας</p>
+                <a href="/nurses" class="btn btn-primary">Ανακαλύψτε τους Νοσηλευτές</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 feature-card">
+            <div class="card-body text-center">
+                <i class="bi bi-people feature-icon"></i>
+                <h3 class="card-title mt-3">Διοικητικό Προσωπικό</h3>
+                <p class="card-text">Ανακαλύψτε το διοικητικό προσωπικό του Νοσοκομείου μας</p>
+                <a href="/administrative" class="btn btn-primary">Ανακαλύψτε το διοικητικό προσωπικό</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

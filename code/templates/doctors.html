@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Ιατροί - Υγειόπολης{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Ιατρικό Προσωπικό</h1>
+
+<div class="row">
+    {% for doctor in doctors %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm text-center">
+            
+            <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 150px;">
+                <span class="display-6 fw-bold">Dr.</span>
+            </div>
+            
+            <div class="card-body">
+                <h5 class="card-title text-primary">{{ doctor.ΟΝΟΜΑ }} {{ doctor.ΕΠΩΝΥΜΟ }}</h5>
+                
+                <p class="card-text text-start">
+                    <strong>Ειδικότητα:</strong> {{ doctor.ΕΙΔΙΚΟΤΗΤΑ }}<br>
+                    <strong>Βαθμίδα:</strong> {{ doctor.ΒΑΘΜΙΔΑ }}<br>
+                    <small class="text-muted">Email: {{ doctor.EMAIL }}</small>
+                </p>
+                
+                <a href="{{ url_for('doctor_detail', amka=doctor.ΑΜΚΑ) }}" class="btn btn-sm btn-primary">Προβολή Λεπτομερειών</a>
+            </div>
+        </div>
+    </div>
+    
+    {% else %}
+    <div class="col-12">
+        <div class="alert alert-info">Δεν βρέθηκαν καταχωρημένοι ιατροί στο σύστημα.</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

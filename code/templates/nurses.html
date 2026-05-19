@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Νοσηλευτές - Υγειόπολης{% endblock %}
+
+{% block content %}
+
+<h1 class="mb-4">Νοσηλευτές</h1>
+
+<div class="row">
+    {% for nurse in nurses %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm text-center">
+            
+            <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 150px;">
+                <span class="display-6 fw-bold">Nurse</span>
+            </div>
+            
+            <div class="card-body">
+                <h5 class="card-title text-primary">{{ nurse.ΟΝΟΜΑ }} {{ nurse.ΕΠΩΝΥΜΟ }}</h5>
+                
+                <p class="card-text text-start">
+                    <strong>Βαθμίδα:</strong> {{ nurse.ΒΑΘΜΙΔΑ }}<br>
+                    <small class="text-muted">Email: {{ nurse.EMAIL }}</small>
+                </p>
+                
+                <a href="{{ url_for('nurse_detail', amka=nurse.ΑΜΚΑ) }}" class="btn btn-sm btn-primary">Προβολή Λεπτομερειών</a>
+            </div>
+        </div>
+    </div>
+    
+    {% else %}
+    <div class="col-12">
+        <div class="alert alert-info">Δεν βρέθηκαν καταχωρημένοι νοσηλευτές στο σύστημα.</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

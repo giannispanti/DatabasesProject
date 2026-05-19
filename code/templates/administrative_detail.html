@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ administrative.ΟΝΟΜΑ }} {{ administrative.ΕΠΩΝΥΜΟ }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <a href="/administrative" class="btn btn-outline-secondary mb-4">&larr; Πίσω</a>
+    
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Καρτέλα Διοικητικού Υπαλλήλου: {{ administrative.ΟΝΟΜΑ }} {{ administrative.ΕΠΩΝΥΜΟ }}</h2>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 text-center bg-light p-4 rounded mb-3">
+                    <span class="display-1 fw-bold text-secondary">Διοικητικός Υπάλληλος</span>
+                    <h3 class="mt-3">{{ administrative.ΟΝΟΜΑ }} {{ administrative.ΕΠΩΝΥΜΟ }}</h3>
+                    <span class="badge bg-success fs-6">{{ administrative.ΡΟΛΟΣ }}</span>
+                </div>
+                <div class="col-md-8">
+                    <h4>Πλήρη Στοιχεία από τη Βάση Δεδομένων</h4>
+                    <table class="table table-bordered mt-3">
+                        <tr>
+                            <th class="bg-light" style="width: 35%;">ΑΜΚΑ</th>
+                            <td>{{ administrative.ΑΜΚΑ }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light" style="width: 35%;">Γραφείο Εργασίας</th>
+                            <td>{{ administrative.ΓΡΑΦΕΙΟ_ΕΡΓΑΣΙΑΣ }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Email επικοινωνίας</th>
+                            <td>{{ administrative.EMAIL }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Ημερομηνία Γέννησης</th>
+                            <td>{{ administrative.ΗΜΕΡΟΜΗΝΙΑ_ΓΕΝΝΗΣΗΣ }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Ημερομηνία Πρόσληψης</th>
+                            <td>{{ administrative.ΗΜΕΡΟΜΗΝΙΑ_ΠΡΟΣΛΗΨΗΣ }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
