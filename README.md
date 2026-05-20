@@ -6,7 +6,7 @@ This project aims to emulate a realistic database for hospital, as well as stori
 (ii) Preprocess Real-Reference Data: Preprocessing 4 files that contain real data(drugs, ken codes, etc.) with a python script and loading them with LOAD INFILE.  
 (iii) Data Generation: Includes a Python script (Faker) to create dummy data and loading an sql file which loads the database for testing and generating the real data(ii).  
 (iv) Implements MySQL constraints and triggers, in order to secure the proper functioning while respecting system constraints  
-(v) User Interface:
+(v) User Interface: Using Python and its framework(Flask) for building an interactive UI for our DB. User can see info about hospital's staff and also run his own queries.
 # Assumptions
 (i) Μια νοσηλεία χωρίς ΗΜΕΡΟΜΗΝΙΑ_ΕΞΟΔΟΥ θεωρείται «ανοικτή» — δεν έχει διάγνωση εξόδου και δεν κοστολογείται.  
 (ii) Το ΣΥΝΟΛΙΚΟ_ΚΟΣΤΟΣ υπολογίζεται αυτόματα από trigger κατά το INSERT/UPDATE, βάσει ΚΕΝ + υπέρβασης ΜΔΝ. Δεν επιτρέπεται χειροκίνητη εισαγωγή τιμής.  
