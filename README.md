@@ -18,4 +18,10 @@ This project aims to emulate a realistic database for hospital, as well as stori
 (viii) Μόνο ένας ιατρός παρακολουθεί την εκάστοτε νοσηλεία (όχι ομάδα ιατρών)
 (ix) Τα triggers εισάγονται μετά το load (install -> load -> triggers), εξασφαλίζουμε την ορθότητα/περιορισμούς στο ίδιο το py script, για την αποφυγή conflicts κατά την φόρτωση δεδομένων  
 # Technical Details
-και αυτα
+Technologies Used:  
+MySQL(MariaDB): MySQL was used for setting up, storing and managing the database, as well as executing SQL queries.  
+XAMP/PhpMyAdmin: Used to create a local development environment for managing the MySQL database and running the web application via Apache.  
+Python: Python was used for developing the application and preprocessing/generating the necessary data through the load_generator.py and preprocess_ref.py script.  
+Flask: The web server for the application was created using Flask.  
+HTML/CSS: HTML and CSS were used to develop the user interface (UI).
+
