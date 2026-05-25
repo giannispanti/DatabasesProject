@@ -23,5 +23,5 @@ MySQL(MariaDB): MySQL was used for setting up, storing and managing the database
 XAMP/PhpMyAdmin: Used to create a local development environment for managing the MySQL database and running the web application via Apache.  
 Python: Python was used for developing the application and preprocessing/generating the necessary data through the load_generator.py and preprocess_ref.py script.  
 Flask: The web server for the application was created using Flask.  
-HTML/CSS: HTML and CSS were used to develop the user interface (UI).
+HTML/CSS: HTML and CSS were used to develop the user interface (UI) .
 
